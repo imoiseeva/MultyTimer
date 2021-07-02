@@ -13,6 +13,7 @@
 		5F4C5A86268F630800F12E1D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F4C5A84268F630800F12E1D /* LaunchScreen.storyboard */; };
 		5F4C5AAE268F752600F12E1D /* Cell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4C5AAD268F752600F12E1D /* Cell.swift */; };
 		5F4C5AB0268F7CA100F12E1D /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4C5AAF268F7CA100F12E1D /* Model.swift */; };
+		5F4C5AB2268FCE3700F12E1D /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4C5AB1268FCE3600F12E1D /* Helper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		5F4C5A87268F630800F12E1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5F4C5AAD268F752600F12E1D /* Cell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cell.swift; sourceTree = "<group>"; };
 		5F4C5AAF268F7CA100F12E1D /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		5F4C5AB1268FCE3600F12E1D /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 			children = (
 				5F4C5A79268F630500F12E1D /* AppDelegate.swift */,
 				5F4C5A7D268F630500F12E1D /* MainViewController.swift */,
+				5F4C5AB1268FCE3600F12E1D /* Helper.swift */,
 				5F4C5AAD268F752600F12E1D /* Cell.swift */,
 				5F4C5AAF268F7CA100F12E1D /* Model.swift */,
 				5F4C5A82268F630800F12E1D /* Assets.xcassets */,
@@ -138,6 +141,7 @@
 			files = (
 				5F4C5A7E268F630500F12E1D /* MainViewController.swift in Sources */,
 				5F4C5A7A268F630500F12E1D /* AppDelegate.swift in Sources */,
+				5F4C5AB2268FCE3700F12E1D /* Helper.swift in Sources */,
 				5F4C5AAE268F752600F12E1D /* Cell.swift in Sources */,
 				5F4C5AB0268F7CA100F12E1D /* Model.swift in Sources */,
 			);
