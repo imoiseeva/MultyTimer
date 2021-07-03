@@ -45,6 +45,7 @@ class MainViewController: UIViewController {
     
     private var buttonAdd: UIButton = {
        let button = UIButton()
+        //  button.frame = CGRect(x: -60, y: 60, width: 50, height: 50)
         button.backgroundColor = #colorLiteral(red: 0.809979856, green: 0.8100972176, blue: 0.809954226, alpha: 1)
         button.setTitle("Добавить", for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
@@ -55,6 +56,17 @@ class MainViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    
+    private var timerLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Таймеры"
+        label.textColor = #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1)
+        label.font = UIFont.boldSystemFont(ofSize: 10.0)
+             label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,6 +111,7 @@ class MainViewController: UIViewController {
         view.addSubview(nameOfTimer)
         view.addSubview(timeInSeconds)
         view.addSubview(buttonAdd)
+        view.addSubview(timerLabel)
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
     }
@@ -107,28 +120,29 @@ class MainViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             addTimerLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
-            addTimerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            addTimerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 17),
             
             nameOfTimer.topAnchor.constraint(equalTo: addTimerLabel.bottomAnchor, constant: 10),
-            nameOfTimer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            nameOfTimer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 17),
             nameOfTimer.widthAnchor.constraint(equalToConstant: 200),
             nameOfTimer.heightAnchor.constraint(equalToConstant: 20),
             
             
             timeInSeconds.topAnchor.constraint(equalTo: nameOfTimer.bottomAnchor, constant: 10),
-            timeInSeconds.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            timeInSeconds.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 17),
             timeInSeconds.widthAnchor.constraint(equalToConstant: 200),
             timeInSeconds.heightAnchor.constraint(equalToConstant: 20),
             
-            buttonAdd.topAnchor.constraint(equalTo: timeInSeconds.bottomAnchor, constant: 15),
-            buttonAdd.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
-            buttonAdd.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            buttonAdd.topAnchor.constraint(equalTo: timeInSeconds.bottomAnchor, constant: 20),
+            buttonAdd.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 17),
+            buttonAdd.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -17),
             //buttonAdd.widthAnchor.constraint(equalToConstant: 250),
         
-            
+            timerLabel.bottomAnchor.constraint(equalTo: tableView.topAnchor),
+            timerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 17),
             
             tableView.topAnchor.constraint(equalTo: view.centerYAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
