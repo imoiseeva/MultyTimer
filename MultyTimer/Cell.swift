@@ -12,10 +12,10 @@ class Cell: UITableViewCell {
     private let offset: CGFloat = 16
     private let width: CGFloat = 50
     
-    var timer: Model? {
+    var timer: Timers? {
         didSet {
-            nameOfTimer.text = timer?.timerName
-            time.text = timer?.time
+            nameOfTimer.text = timer?.timersName
+            time.text = timer?.seconds
         }
     }
     
@@ -57,10 +57,9 @@ class Cell: UITableViewCell {
         ])
     }
     
-    func configureCell(data: Model) {
-        nameOfTimer.text = data.timerName
-        time.text = data.time
+    func configureCell(data: Timers) {
+        nameOfTimer.text = data.timersName
+        time.text = data.seconds
 
     }
-    
 }
