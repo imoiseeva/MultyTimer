@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -19,7 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             window?.rootViewController = UINavigationController(rootViewController: MainViewController())
             return true
         }
-
-
+    func applicationWillTerminate(_ application: UIApplication) {
+        StorageManager.shared.saveContext()
+    }
 }
 
