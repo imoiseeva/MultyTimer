@@ -9,15 +9,10 @@ import UIKit
 import CoreData
 
 class MainViewController: UIViewController {
-    
-    
-    
+ 
     var tableView = UITableView()
-    
-    //  var countOfNumbers: [Model] = [Model]()
-    // var timer = Model.getTimers()
-    
-    private var arrayTimets: [Timers] = []
+
+   // private var arrayTimets: [Timers] = []
     var realTimer = Timer()
     var totalSecond = 10
     private var timer = StorageManager.shared.fetchData()
@@ -51,7 +46,6 @@ class MainViewController: UIViewController {
         return textField
     }()
     
-    
     private var buttonAdd: UIButton = {
         let button = UIButton()
         button.backgroundColor = #colorLiteral(red: 0.809979856, green: 0.8100972176, blue: 0.809954226, alpha: 1)
@@ -82,14 +76,11 @@ class MainViewController: UIViewController {
         setupNavigationBar()
         setupIUElements()
         setConstraints()
-        
-        
-        
+    
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        //  totalSecond = Int(totalSecond.text) ?? 5
         tableView.reloadData()
     }
     
@@ -108,10 +99,10 @@ class MainViewController: UIViewController {
         navigationController?.navigationBar.scrollEdgeAppearance = navBarApearence
     }
     
-    func setupIUElements() {
+   private func setupIUElements() {
         tableView.delegate = self
         tableView.dataSource = self
-        //tableView.tableFooterView = UIView()
+
         tableView.separatorStyle = .singleLine
         tableView.frame = .zero
         
@@ -136,7 +127,6 @@ class MainViewController: UIViewController {
             nameOfTimer.widthAnchor.constraint(equalToConstant: 200),
             nameOfTimer.heightAnchor.constraint(equalToConstant: 20),
             
-            
             timeInSeconds.topAnchor.constraint(equalTo: nameOfTimer.bottomAnchor, constant: 10),
             timeInSeconds.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 17),
             timeInSeconds.widthAnchor.constraint(equalToConstant: 200),
@@ -157,17 +147,20 @@ class MainViewController: UIViewController {
     }
     
     @objc func saveButton() {
+   
         guard let timerName = nameOfTimer.text else { return }
         guard let seconds = timeInSeconds.text else { return }
-        
-        StorageManager.shared.save(timerName, seconds: seconds) {[weak self] objectId in
-            guard let index = self?.timer.firstIndex(where: {$0.objectID == objectId}) else {
-                assertionFailure()
-                return
-            }
-            self?.tableView.insertRows(at: [IndexPath(row: index, section: 0)],
-                                       with: .automatic)
+            
+            StorageManager.shared.save(timerName, seconds) { timerNewItem in
+                self.timer.append(timerNewItem)
+                self.tableView.insertRows(
+                    at: [IndexPath(row: self.timer.count - 1, section: 0)],
+                    with: .automatic
+                )
         }
+        
+        startTimer()
+
         nameOfTimer.text = nil
         timeInSeconds.text = nil
     }
@@ -208,9 +201,9 @@ extension MainViewController {
         let task = timer[indexPath.row]
         
         if editingStyle == .delete {
-            StorageManager.shared.delete(task.objectID) {
-                tableView.deleteRows(at: [indexPath], with: .automatic)
-            }
+            timer.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+            StorageManager.shared.delete(task)
         }
     }
 }
@@ -218,5 +211,31 @@ extension MainViewController {
 // MARK: - Timer
 extension MainViewController {
     
+    func startTimer() {
+        
+        realTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTime), userInfo: nil, repeats: true)
+        
+    }
+    
+    @objc func updateTime(data: Timers, index: IndexPath){
+     guard var time = data.seconds else { return }
+     totalSecond = Int(time)!
+     print(timeFormatted(totalSecond))
+        time = String(timeFormatted(totalSecond))
+     if totalSecond != 0 {
+         totalSecond -= 1
+     } else {
+         endTimer()
+     }
+ }
+    
+    func endTimer() {
+        realTimer.invalidate()
+    }
+    
+    func timeFormatted(_ totalSeconds: Int) -> String {
+        let seconds: Int = totalSeconds % 60
+        return String(format: "0:%02d", seconds)
+    }
     
 }

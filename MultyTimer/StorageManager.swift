@@ -40,24 +40,18 @@ class StorageManager {
             print("Failed to fetch data", error)
             return []
         }
-        
     }
     
     // Save data
-    func save(_ timerName: String, seconds: String, completion: @escaping (NSManagedObjectID) -> Void) {
-        persistentContainer.performBackgroundTask { context in
-            let timer = Timers(context: context)
-            timer.timersName = timerName
-            timer.seconds = seconds
-            do {
-                try context.save()
-            } catch {
-                fatalError("Unresolved error \(error.localizedDescription)")
-            }
-            DispatchQueue.main.async {
-                completion(timer.objectID)
-            }
-        }
+    func save(_ timerName: String, _ seconds: String, completion: (Timers) -> Void) {
+        
+        let timer = Timers(context: viewContext)
+        timer.timersName = timerName
+        timer.seconds = seconds
+        
+       completion(timer)
+        saveContext()
+ 
     }
     
     func edit(_ timer: Timers, newName: String) {
@@ -65,19 +59,9 @@ class StorageManager {
         saveContext()
     }
     
-    func delete(_ objectID: NSManagedObjectID, completion: @escaping () -> Void) {
-        persistentContainer.performBackgroundTask { context in
-            let object = context.object(with: objectID)
-            context.delete(object)
-            do {
-                try context.save()
-            } catch {
-                fatalError("Unresolved error \(error.localizedDescription)")
-            }
-            DispatchQueue.main.async {
-                completion()
-            }
-        }
+    func delete(_ timer: Timers) {
+        viewContext.delete(timer)
+        saveContext()
     }
     
     // MARK: - Core Data Saving support
@@ -92,3 +76,4 @@ class StorageManager {
         }
     }
 }
+
