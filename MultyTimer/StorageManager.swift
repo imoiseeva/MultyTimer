@@ -29,29 +29,35 @@ class StorageManager {
     
     private init(){}
     
-// MARK: - Public Methods
+    // MARK: - Public Methods
     func fetchData() -> [Timers] {
         let fetchRequest: NSFetchRequest<Timers> = Timers.fetchRequest()
         let sort = NSSortDescriptor(key: #keyPath(Timers.seconds), ascending: true, selector: #selector(NSString.localizedStandardCompare(_:)))
         fetchRequest.sortDescriptors = [sort]
-    do {
-        return try viewContext.fetch(fetchRequest)
-    } catch let error {
-        print("Failed to fetch data", error)
-        return []
-    }
+        do {
+            return try viewContext.fetch(fetchRequest)
+        } catch let error {
+            print("Failed to fetch data", error)
+            return []
+        }
         
     }
     
     // Save data
-    func save(_ timerName: String, seconds: String, completion: (Timers) -> Void) {
-
-        let timer = Timers(context: viewContext)
-        timer.timersName = timerName
-        timer.seconds = seconds
-        
-        completion(timer)
-        saveContext()
+    func save(_ timerName: String, seconds: String, completion: @escaping (NSManagedObjectID) -> Void) {
+        persistentContainer.performBackgroundTask { context in
+            let timer = Timers(context: context)
+            timer.timersName = timerName
+            timer.seconds = seconds
+            do {
+                try context.save()
+            } catch {
+                fatalError("Unresolved error \(error.localizedDescription)")
+            }
+            DispatchQueue.main.async {
+                completion(timer.objectID)
+            }
+        }
     }
     
     func edit(_ timer: Timers, newName: String) {
@@ -59,11 +65,21 @@ class StorageManager {
         saveContext()
     }
     
-    func delete(_ timer: Timers) {
-        viewContext.delete(timer)
-        saveContext()
+    func delete(_ objectID: NSManagedObjectID, completion: @escaping () -> Void) {
+        persistentContainer.performBackgroundTask { context in
+            let object = context.object(with: objectID)
+            context.delete(object)
+            do {
+                try context.save()
+            } catch {
+                fatalError("Unresolved error \(error.localizedDescription)")
+            }
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
     }
-
+    
     // MARK: - Core Data Saving support
     func saveContext() {
         if viewContext.hasChanges {

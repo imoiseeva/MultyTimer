@@ -10,15 +10,16 @@ import CoreData
 
 class MainViewController: UIViewController {
     
-  
+    
     
     var tableView = UITableView()
     
-  //  var countOfNumbers: [Model] = [Model]()
-   // var timer = Model.getTimers()
+    //  var countOfNumbers: [Model] = [Model]()
+    // var timer = Model.getTimers()
     
     private var arrayTimets: [Timers] = []
-    
+    var realTimer = Timer()
+    var totalSecond = 10
     private var timer = StorageManager.shared.fetchData()
     
     private var addTimerLabel: UILabel = {
@@ -32,7 +33,7 @@ class MainViewController: UIViewController {
     }()
     
     private var nameOfTimer: UITextField = {
-       let textField = UITextField()
+        let textField = UITextField()
         textField.attributedPlaceholder = NSAttributedString(string: "Название таймера",
                                                              attributes: [NSAttributedString.Key.font:UIFont(name: "Georgia", size: 10.0)!])
         textField.borderStyle = .roundedRect
@@ -41,7 +42,7 @@ class MainViewController: UIViewController {
     }()
     
     private var timeInSeconds: UITextField = {
-       let textField = UITextField()
+        let textField = UITextField()
         textField.placeholder = "Время в секудах"
         textField.attributedPlaceholder = NSAttributedString(string: "Время в секудах",
                                                              attributes: [NSAttributedString.Key.font:UIFont(name: "Georgia", size: 10.0)!])
@@ -52,7 +53,7 @@ class MainViewController: UIViewController {
     
     
     private var buttonAdd: UIButton = {
-       let button = UIButton()
+        let button = UIButton()
         button.backgroundColor = #colorLiteral(red: 0.809979856, green: 0.8100972176, blue: 0.809954226, alpha: 1)
         button.setTitle("Добавить", for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
@@ -68,26 +69,30 @@ class MainViewController: UIViewController {
         label.text = "Таймеры"
         label.textColor = #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1)
         label.font = UIFont.boldSystemFont(ofSize: 10.0)
-             label.textAlignment = .center
+        label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-     
+        
         setupNavigationBar()
         setupIUElements()
         setConstraints()
+        
+        
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        //  totalSecond = Int(totalSecond.text) ?? 5
         tableView.reloadData()
     }
-
+    
     private func setupNavigationBar() {
         title = "Мульти таймер"
         
@@ -102,7 +107,7 @@ class MainViewController: UIViewController {
         navigationController?.navigationBar.standardAppearance = navBarApearence
         navigationController?.navigationBar.scrollEdgeAppearance = navBarApearence
     }
-
+    
     func setupIUElements() {
         tableView.delegate = self
         tableView.dataSource = self
@@ -140,8 +145,7 @@ class MainViewController: UIViewController {
             buttonAdd.topAnchor.constraint(equalTo: timeInSeconds.bottomAnchor, constant: 20),
             buttonAdd.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 17),
             buttonAdd.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -17),
-            //buttonAdd.widthAnchor.constraint(equalToConstant: 250),
-        
+            
             timerLabel.bottomAnchor.constraint(equalTo: tableView.topAnchor),
             timerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 17),
             
@@ -155,13 +159,14 @@ class MainViewController: UIViewController {
     @objc func saveButton() {
         guard let timerName = nameOfTimer.text else { return }
         guard let seconds = timeInSeconds.text else { return }
-
-        StorageManager.shared.save(timerName, seconds: seconds) { timerNew in
-            self.timer.append(timerNew)
-            self.tableView.insertRows(
-                at: [IndexPath(row: self.timer.count - 1, section: 0)],
-                with: .automatic
-            )
+        
+        StorageManager.shared.save(timerName, seconds: seconds) {[weak self] objectId in
+            guard let index = self?.timer.firstIndex(where: {$0.objectID == objectId}) else {
+                assertionFailure()
+                return
+            }
+            self?.tableView.insertRows(at: [IndexPath(row: index, section: 0)],
+                                       with: .automatic)
         }
         nameOfTimer.text = nil
         timeInSeconds.text = nil
@@ -171,26 +176,25 @@ class MainViewController: UIViewController {
 // MARK: - Table View Delegate and DataSourse protocols
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
-
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return timer.count
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         tableView.register(Cell.self, forCellReuseIdentifier: "MyCell")
         let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as! Cell
-
-      var content = cell.defaultContentConfiguration()
+        
+        var content = cell.defaultContentConfiguration()
         let item = timer[indexPath.row]
         content.text = item.timersName
         content.secondaryText = item.seconds
         content.prefersSideBySideTextAndSecondaryText = true
-       cell.contentConfiguration = content
-      
+        cell.contentConfiguration = content
+        
         return cell
     }
     
-
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 40
     }
@@ -200,13 +204,19 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
 extension MainViewController {
     
     // Delete task
-  func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         let task = timer[indexPath.row]
         
         if editingStyle == .delete {
-            timer.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
-            StorageManager.shared.delete(task)
+            StorageManager.shared.delete(task.objectID) {
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
         }
     }
+}
+
+// MARK: - Timer
+extension MainViewController {
+    
+    
 }
